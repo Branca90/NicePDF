@@ -53,15 +53,136 @@ Il progetto utilizza le seguenti librerie Python:
    ```bash
    git clone git@github.com:Branca90/NicePDF.git
    cd NicePDF
+# Crea e attiva un ambiente virtuale
 
-### Crea e attiva un ambiente virtuale:
 ```bash
 python3 -m venv venv
 source venv/bin/activate
-Installa le dipendenze Python:
+```
+
+# Installa le dipendenze Python
+
 ```bash
 pip install pdf2image pytesseract pillow pandas
-Installa le dipendenze di sistema:
+```
+
+# Installa le dipendenze di sistema
+
 ```bash
 sudo apt update
 sudo apt install tesseract-ocr libtesseract-dev poppler-utils
+```
+
+# Utilizzo
+
+Il progetto utilizza un unico script principale: `nicepdf.py`. Offre un menu interattivo per gestire il flusso di lavoro:
+
+```bash
+python3 src/nicepdf.py
+```
+
+## Opzioni
+
+1. Converte il PDF in immagini PNG e le salva in `temp_images/`.
+2. Estrae tabelle e testo dalle immagini in `temp_images/` e crea `output.json`.
+3. Esce dal programma.
+
+# Esempio
+
+Assicurati che un file PDF sia presente in `data/sample.pdf`.
+
+Esegui il programma e seleziona l'opzione 1 per convertire il PDF in immagini.
+
+Seleziona l'opzione 2 per estrarre i dati e generare `output.json`.
+
+# Comandi utili
+
+Ecco alcuni comandi utili per lavorare con il progetto:
+
+## Attiva l'ambiente virtuale
+
+```bash
+source venv/bin/activate
+```
+
+## Disattiva l'ambiente virtuale
+
+```bash
+deactivate
+```
+
+## Installa tutte le dipendenze in un colpo solo (senza PaddleOCR)
+
+```bash
+pip install pdf2image pytesseract pillow pandas
+```
+
+## Installa PaddleOCR (solo per desktop con AVX)
+
+```bash
+pip install paddlepaddle paddleocr
+```
+
+## Verifica le librerie installate
+
+```bash
+pip list
+```
+
+## Esegui lo script principale
+
+```bash
+python3 src/nicepdf.py
+```
+
+## Rimuovi tutte le immagini temporanee (se necessario)
+
+```bash
+rm -rf temp_images/*
+```
+
+## Controlla lo stato del repository Git
+
+```bash
+git status
+```
+
+## Push delle modifiche su GitHub
+
+```bash
+git add .
+git commit -m "Descrizione delle modifiche"
+git push origin main
+```
+
+# Funzionalità di Tesseract utilizzate
+
+NICEPDF si basa su Tesseract OCR per il riconoscimento del testo. Di seguito sono elencate le funzionalità di Tesseract che utilizziamo e il loro scopo:
+
+## Riconoscimento del testo (`image_to_string`)
+
+Utilizzata nella funzione `extract_raw_text` per estrarre testo grezzo da un'immagine.
+
+Serve per convertire immagini di testo (es. pagine scansionate) in testo leggibile, utile quando non ci sono tabelle strutturate.
+
+Configurazione: `--psm 3 --dpi 300` (modalità di segmentazione automatica con risoluzione stimata).
+
+## Estrazione dei dati con coordinate (`image_to_data`)
+
+Utilizzata nella funzione `extract_table_with_ocr` per estrarre testo insieme alle sue coordinate (left, top, width, height).
+
+Serve per ricostruire tabelle identificando la posizione del testo nell'immagine, permettendo di separare righe e colonne.
+
+Configurazione: `--psm 6 --dpi 300` (assume un blocco di testo uniforme, ottimale per tabelle).
+
+## Supporto multilingue
+
+Tesseract supporta oltre 100 lingue, ma nel nostro script usiamo `lang="eng"` per il riconoscimento in inglese.
+
+Può essere configurato per altre lingue (es. `lang="ita"` per l'italiano) se necessario.
+
+## Pre-elaborazione delle immagini
+
+Anche se Tesseract ha funzionalità interne di pre-elaborazione, noi utilizziamo Pillow per migliorare la qualità delle immagini prima di passarle a Tesseract (es. conversione in scala di grigi, aumento del contrasto, sogliatura binaria).
+
+Questo migliora l'accuratezza dell'OCR, specialmente per PDF scansionati di bassa qualità.
