@@ -54,8 +54,6 @@ Il progetto utilizza le seguenti librerie Python:
    git clone git@github.com:Branca90/NicePDF.git
    cd NicePDF
 
-   ## Installazione
-
 ### Crea e attiva un ambiente virtuale:
 ```bash
 python3 -m venv venv
