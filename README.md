@@ -10,4 +10,4 @@ Un progetto Python per estrarre tabelle da PDF, inclusi quelli scansionati trami
 ## Installazione
 1. Clona la repository:
    ```bash
-   git clone https://github.com/tuo-username/PDFTableExtractor.git
+   git clone https://github.com/Branca90/NicePDF.git
