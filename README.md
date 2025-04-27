@@ -186,3 +186,58 @@ Può essere configurato per altre lingue (es. `lang="ita"` per l'italiano) se ne
 Anche se Tesseract ha funzionalità interne di pre-elaborazione, noi utilizziamo Pillow per migliorare la qualità delle immagini prima di passarle a Tesseract (es. conversione in scala di grigi, aumento del contrasto, sogliatura binaria).
 
 Questo migliora l'accuratezza dell'OCR, specialmente per PDF scansionati di bassa qualità.
+
+# Integrazione di PaddleOCR (in fase di sviluppo)
+
+Stiamo pianificando di integrare PaddleOCR come alternativa a Tesseract per migliorare l'accuratezza dell'OCR, specialmente per documenti complessi. Tuttavia, PaddleOCR ha requisiti hardware specifici:
+
+## Requisiti hardware
+PaddleOCR richiede processori con supporto per istruzioni AVX (Advanced Vector Extensions). Questo significa che funziona solo su macchine che supportano AVX, come la maggior parte dei desktop moderni (es. Intel Core i5/i7 di generazione recente).
+
+## Limitazioni
+PaddleOCR non funziona su macchine che non supportano AVX, come alcune macchine virtuali (VM), inclusa quella attualmente utilizzata (VBox senza supporto AVX).
+
+## Versioni del progetto
+1. **Versione per VM:** Continuerà a utilizzare Tesseract OCR, che non richiede AVX ed è compatibile con la maggior parte delle macchine.
+2. **Versione per desktop:** Includerà PaddleOCR per sfruttare le sue capacità avanzate di OCR, ma sarà utilizzabile solo su macchine con supporto AVX.
+
+## Prossimi passi
+La compilazione delle due versioni (per VM e desktop) è pianificata per domani.
+
+## Limitazioni e requisiti hardware
+### Compatibilità con processori AVX
+Tesseract OCR (versioni recenti come la 5.2) e PaddleOCR possono sfruttare le istruzioni AVX e AVX-512 per migliorare le prestazioni, con un guadagno di circa il 10% in termini di velocità su processori che supportano AVX-512F. Tuttavia, non tutti i processori supportano AVX, e questo può causare errori come "Illegal instruction" su macchine che non hanno queste istruzioni (es. la tua VM, che non supporta AVX come mostrato dall'output di `lscpu`).
+
+### Soluzione per Tesseract:
+- Usa una versione di Tesseract che non dipende da AVX (es. Tesseract 4.0 o inferiore), anche se potrebbe essere più lenta.
+- Esegui il programma su una macchina fisica che supporti AVX.
+- Configura la VM per abilitare il supporto AVX, se l'hypervisor lo permette.
+
+### Soluzione per PaddleOCR:
+PaddleOCR richiede AVX, quindi sarà disponibile solo nella versione per desktop. La versione per VM continuerà a utilizzare Tesseract.
+
+## Fattibilità in VM
+Molte macchine virtuali (VM), come quella che stai utilizzando, non supportano istruzioni avanzate come AVX o AVX-512, a meno che non siano esplicitamente abilitate nell'hypervisor (es. VirtualBox, VMware). Questo rende l'uso di PaddleOCR non fattibile in un ambiente VM senza AVX. Per risolvere:
+
+1. Usa Tesseract (come nella versione attuale del progetto).
+2. Esegui il programma su una macchina fisica che supporti AVX.
+3. Configura la VM per abilitare il supporto AVX, se l'hypervisor lo permette (es. in VirtualBox, vai su Settings > System > Processor e abilita "Enable Nested VT-x/AMD-V" e "Enable PAE/NX").
+
+## Affidabilità dell'estrazione
+Il risultato attuale di `output.json` (usando Tesseract) ha un'affidabilità di 5/10 a causa di:
+- Errori di OCR (es. "Dee" invece di "Dec", "Switzerland" invece di "Sitzerland").
+- Struttura delle tabelle frammentata (le intestazioni e i dati non sono ben allineati).
+
+Per migliorare, considera:
+- Regolare i parametri di Tesseract (es. `--psm 4` per migliorare l'estrazione su colonne singole).
+- Migliorare la pre-elaborazione delle immagini con filtri aggiuntivi.
+- Testare su un PDF più semplice.
+- Usare PaddleOCR (solo su desktop con AVX) per migliorare l'accuratezza dell'OCR.
+
+## Contributi
+Contributi e suggerimenti sono benvenuti! Apri una issue o una pull request su GitHub.
+
+## Licenza
+Questo progetto è rilasciato sotto la licenza MIT.
+
+
